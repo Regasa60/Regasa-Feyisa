@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pregnancy Calendar: GA & EDD Calculation (G.C.)</title>
+  <style>
+    /* Basic styling for layout */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      width: 80%;
+      max-width: 1000px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    h1 {
+      color: hwb(120 0% 20%);
+      font-size: 50px;
+      text-align: center; width:auto; text-align: center;
+    }
+
+    .section {
+      background-color: #e6f7ff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      font-size: 1.1rem;
+      margin-right: 10px;
+    }
+
+    input {
+      font-size: 1rem;
+      padding: 8px;
+      margin: 10px 0;
+      width: 250px;
+      border: 2px solid #007acc;
+      border-radius: 5px;
+      display: block;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      font-size: 1rem;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+      max-width: 250px;
+      margin: 10px 0;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .result {
+      background-color: #f4f4f4;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+
+    .classification {
+      background-color: #f3f3f3;
+      padding: 15px;
+      border-radius: 5px;
+    }
+
+    .classification h3 {
+      color: #0077cc;
+      font-size: 1.5rem;
+    }
+
+    .classification ul {
+      font-size: 1.1rem;
+      padding-left: 20px;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #777;
+    }
+    li{font-size: 20px;width: auto;color: red;padding-right: 0%;margin: auto;}
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Pregnancy Calendar: GA & EDD Calculation (G.C.)</h1>
+
+    <!-- LMP Section -->
+    <div class="section">
+      <h2>1. Pregnancy Due Date Calculator from LMP</h2>
+      <label for="lmp">Enter the first day of your last menstrual period (LMP):</label>
+      <input type="date" id="lmp">
+      <button onclick="calculateDueDateLMP()">Calculate Due Date from LMP</button>
+      <p id="dueDateLMP" class="result"></p>
+      <p id="gaLMP" class="result"></p>
+      <p id="eddLMP" class="result"></p>
+    </div>
+
+    <!-- Ultrasound Section -->
+    <div class="section">
+      <h2>2. GA & EDD Calculation from Ultrasound</h2>
+      <label for="ultrasoundDate">Enter Ultrasound Date:</label>
+      <input type="date" id="ultrasoundDate" value="2024-11-02">
+      
+      <label for="ultrasoundGA">Enter Gestational Age (GA) at Ultrasound (in weeks):</label>
+      <input type="number" id="ultrasoundGA" value="18">
+      
+      <button onclick="calculateGAandEDD()">Calculate GA & EDD from Ultrasound</button>
+      <p id="currentGA" class="result"></p>
+      <p id="edd" class="result"></p>
+    </div>
+
+    <!-- GA Classification Section -->
+    <div class="classification">
+      <h3>Gestational Age (GA) Classification</h3>
+      <ul>
+        <li><strong>First Trimester:</strong> 0 to 12 weeks</li>
+        <li><strong>Second Trimester:</strong> 13 to 26 weeks</li>
+        <li><strong>Third Trimester:</strong>
+          <ul>
+            <li><strong>Early Term:</strong> 37 weeks to 38 weeks and 6 days</li>
+            <li><strong>Full Term:</strong> 39 weeks to 40 weeks and 6 days</li>
+            <li><strong>Late Term:</strong> 41 weeks to 41 weeks and 6 days</li>
+            <li><strong>Post-Term:</strong> 42 weeks and beyond</li>
+          </ul>
+        </li>
+        <li><strong>Preterm Pregnancy:</strong>
+          <ul>
+            <li><strong>Very Early Preterm:</strong> < 28 weeks</li>
+            <li><strong>Early Preterm:</strong> 28 weeks to 33 weeks and 6 days</li>
+            <li><strong>Late Preterm:</strong> 34 weeks to 36 weeks and 6 days</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Developer Info -->
+    <div class="footer">
+      <p>Developed by 2PAC (Regasa) Developer</p>
+    </div>
+
+  </div>
+  <script>
+    // 1. Calculate Due Date from LMP with weeks and days
+    function calculateDueDateLMP() {
+      const lmp = document.getElementById('lmp').value;
+      if (!lmp) {
+        alert("❗ Please enter a valid date.");
+        return;
+      }
+  
+      const lmpDate = new Date(lmp);
+  
+      // Calculate Due Date (EDD)
+      const dueDate = new Date(lmpDate);
+      dueDate.setDate(dueDate.getDate() + 280); // Add 280 days (40 weeks)
+  
+      // Calculate Gestational Age (GA) in weeks and days
+      const currentDate = new Date();
+      const timeDifference = Math.abs(currentDate - lmpDate);
+      const diffDays = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+      const currentGAWeeks = Math.floor(diffDays / 7);
+      const currentGADays = diffDays % 7;
+  
+      // Output the results
+      document.getElementById("dueDateLMP").innerText = `🎯 Your Expected Date Delivery (EDD): ${dueDate.toLocaleDateString()}`;
+      document.getElementById("gaLMP").innerText = `📅 Current Gestational Age (GA): ${currentGAWeeks} weeks + ${currentGADays} days`;
+      document.getElementById("eddLMP").innerText = `📆 Expected Date Delivery (EDD): ${dueDate.toLocaleDateString()}`;
+    }
+  
+    // 2. Calculate GA & EDD from Ultrasound with weeks and days
+    function calculateGAandEDD() {
+      const ultrasoundDate = new Date(document.getElementById('ultrasoundDate').value);
+      const ultrasoundGAWeeks = parseInt(document.getElementById('ultrasoundGA').value);
+      const currentDate = new Date();
+  
+      // Calculate the difference in days between ultrasound date and today's date
+      const timeDifference = Math.abs(currentDate - ultrasoundDate);
+      const diffDays = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+  
+      // Calculate weeks and days passed since ultrasound
+      const weeksPassed = Math.floor(diffDays / 7);
+      const daysPassed = diffDays % 7;
+  
+      // Calculate the current gestational age (GA)
+      const currentGAWeeks = ultrasoundGAWeeks + weeksPassed;
+      const currentGADays = daysPassed;
+  
+      // Calculate the estimated due date (EDD)
+      const dueDate = new Date(ultrasoundDate);
+      dueDate.setDate(dueDate.getDate() + (40 - ultrasoundGAWeeks) * 7);
+  
+      document.getElementById('currentGA').innerText = `🍼 Current GA: ${currentGAWeeks} weeks + ${currentGADays} days`;
+      document.getElementById('edd').innerText = `🔮 Estimated Due Date (EDD): ${dueDate.toLocaleDateString()}`;
+    }
+  </script>
+</body>
+</html>
